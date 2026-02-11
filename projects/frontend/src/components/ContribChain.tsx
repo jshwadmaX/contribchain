@@ -1,214 +1,137 @@
-import { useEffect, useMemo, useState } from 'react'
+import React, { useState } from 'react'
 import { useWallet } from '@txnlab/use-wallet-react'
-import { useSnackbar } from 'notistack'
-import algosdk, { getApplicationAddress, makePaymentTxnWithSuggestedParamsFromObject } from 'algosdk'
-import { AlgorandClient } from '@algorandfoundation/algokit-utils'
-import { BankClient as ContribChainClient, BankFactory as ContribChainFactory } from "../contracts/Bank";
 
-import { getAlgodConfigFromViteEnvironment, getIndexerConfigFromViteEnvironment } from '../utils/network/getAlgoClientConfigs'
+// Import new components
+import ContributionForm from './contrib/ContributionForm'
+import StatsCards from './contrib/StatsCards'
+import HistoryTable from './contrib/HistoryTable'
+import TeamMembers from './contrib/TeamMembers'
 
-type Statement = {
-  id: string
-  round: number
-  amount: number
-  type: 'deposit' | 'withdrawal'
-  sender: string
-  receiver: string
+interface ContribChainProps {
+  openModal: boolean
+  closeModal: () => void
 }
 
-export const ContribChain = ({ openModal, closeModal }: any) => {
-
-  const { enqueueSnackbar } = useSnackbar()
-  const { activeAddress, transactionSigner } = useWallet()
-
-  const algodConfig = getAlgodConfigFromViteEnvironment()
-  const indexerConfig = getIndexerConfigFromViteEnvironment()
-
-  const algorand = useMemo(
-    () => AlgorandClient.fromConfig({ algodConfig, indexerConfig }),
-    [algodConfig, indexerConfig]
-  )
-
-  const [appId, setAppId] = useState<number | ''>(0)
-  const [deploying, setDeploying] = useState(false)
-
-  // NEW PHASE 3
-  const [taskDescription, setTaskDescription] = useState('')
-  const [hours, setHours] = useState('')
-
+const ContribChain: React.FC<ContribChainProps> = ({ openModal, closeModal }) => {
+  const { activeAddress } = useWallet()
   const [loading, setLoading] = useState(false)
-  const [statements, setStatements] = useState<Statement[]>([])
-  const [depositors, setDepositors] = useState<Array<{ address: string; amount: string }>>([])
 
-  useEffect(() => {
-    algorand.setDefaultSigner(transactionSigner)
-  }, [algorand, transactionSigner])
+  // Mock data (replace with real blockchain data later)
+  const mockContributions = [
+    {
+      id: '1',
+      member: activeAddress || 'ADDR1...',
+      task: 'Built prototype circuit',
+      hours: 8,
+      timestamp: 'Feb 10, 2026',
+    },
+    {
+      id: '2',
+      member: 'ADDR2...',
+      task: 'Completed literature review',
+      hours: 5,
+      timestamp: 'Feb 9, 2026',
+    },
+  ]
 
-  const appAddress = useMemo(
-    () => (appId && appId > 0 ? String(getApplicationAddress(appId)) : ''),
-    [appId]
-  )
+  const mockTeamMembers = [
+    {
+      address: activeAddress || 'ADDR1...',
+      totalHours: 13,
+      percentage: 52,
+      contributions: 3,
+    },
+    {
+      address: 'ADDR2...',
+      totalHours: 8,
+      percentage: 32,
+      contributions: 2,
+    },
+    {
+      address: 'ADDR3...',
+      totalHours: 4,
+      percentage: 16,
+      contributions: 1,
+    },
+  ]
 
-  // ───────── DEPLOY CONTRACT ─────────
-  const deployContract = async () => {
-    try {
-      if (!activeAddress) throw new Error('Connect wallet first')
-
-      setDeploying(true)
-
-      const factory = new ContribChainFactory({
-        defaultSender: activeAddress,
-        algorand,
-      })
-
-      const result = await factory.send.create.bare()
-
-      const newId = Number(result.appClient.appId)
-      setAppId(newId)
-
-      enqueueSnackbar(`Deployed! App ID: ${newId}`, { variant: 'success' })
-
-    } catch (e) {
-      enqueueSnackbar((e as Error).message, { variant: 'error' })
-    } finally {
-      setDeploying(false)
-    }
-  }
-
-  // ───────── LOG CONTRIBUTION (OLD DEPOSIT LOGIC) ─────────
-  const handleLogContribution = async () => {
-    try {
-      if (!activeAddress) throw new Error('Connect wallet')
-      if (!appId) throw new Error('Enter App ID')
-
-      const amountAlgos = Number(hours || 1)
-      const amountMicroAlgos = Math.round(amountAlgos * 1000000)
-
-      setLoading(true)
-
-      const sp = await algorand.client.algod.getTransactionParams().do()
-      const appAddr = getApplicationAddress(appId)
-
-      const payTxn = makePaymentTxnWithSuggestedParamsFromObject({
-        sender: activeAddress,
-        receiver: appAddr,
-        amount: amountMicroAlgos,
-        suggestedParams: sp,
-      })
-
-      const client = new ContribChainClient({
-        appId: BigInt(appId),
-        algorand,
-        defaultSigner: transactionSigner,
-      })
-
-      await client.send.deposit({
-        args: {
-          memo: taskDescription,
-          payTxn: { txn: payTxn, signer: transactionSigner },
-        },
-        sender: activeAddress,
-      })
-
-      enqueueSnackbar('Contribution Logged!', { variant: 'success' })
-
-      setTaskDescription('')
-      setHours('')
-
-    } catch (e) {
-      enqueueSnackbar((e as Error).message, { variant: 'error' })
-    } finally {
+  const handleLogContribution = async (task: string, hours: number) => {
+    setLoading(true)
+    // TODO: Add blockchain logic here
+    console.log('Logging:', { task, hours })
+    
+    // Simulate blockchain delay
+    setTimeout(() => {
       setLoading(false)
-    }
+      alert('Contribution logged! ✅')
+    }, 2000)
   }
 
-  // ───────── UI ─────────
+  if (!openModal) return null
+
   return (
-    <dialog className={`modal ${openModal ? 'modal-open' : ''}`}>
-      <form className="modal-box max-w-3xl">
+    <div className="fixed inset-0 z-50 overflow-y-auto">
+      {/* Backdrop */}
+      <div
+        className="fixed inset-0 bg-black/50 backdrop-blur-sm"
+        onClick={closeModal}
+      />
 
-        <h3 className="font-bold text-lg">ContribChain Contract</h3>
-
-        {/* ===== APP SETUP ===== */}
-        <div className="bg-white p-4 rounded mt-2">
-
-          <label className="text-sm">Application ID</label>
-
-          <input
-            className="input input-bordered w-full mb-2"
-            type="number"
-            value={appId}
-            onChange={(e) =>
-              setAppId(e.target.value === '' ? '' : Number(e.target.value))
-            }
-            placeholder="Enter deployed App ID"
-          />
-
-          {appAddress && (
-            <div className="alert alert-info text-xs break-all mb-2">
-              App Address: {appAddress}
+      {/* Modal Content */}
+      <div className="relative min-h-screen flex items-center justify-center p-4">
+        <div className="relative bg-gradient-to-br from-blue-50 via-white to-indigo-50 rounded-2xl shadow-2xl max-w-7xl w-full p-8">
+          
+          {/* Header */}
+          <div className="flex items-center justify-between mb-6">
+            <div>
+              <h2 className="text-3xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-blue-600 to-indigo-600">
+                ContribChain Dashboard
+              </h2>
+              <p className="text-gray-600 mt-1">
+                Track group project contributions on Algorand blockchain
+              </p>
             </div>
-          )}
+            <button
+              onClick={closeModal}
+              className="text-gray-500 hover:text-gray-700 transition-colors"
+            >
+              <svg className="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+              </svg>
+            </button>
+          </div>
 
-          <button
-            className="btn btn-accent"
-            disabled={!activeAddress || deploying}
-            onClick={(e) => {
-              e.preventDefault()
-              void deployContract()
-            }}
-          >
-            Deploy ContribChain
-          </button>
-        </div>
-
-        {/* ===== LOG CONTRIBUTION ===== */}
-        <div className="bg-white p-4 rounded mt-4">
-
-          <h3 className="font-semibold mb-2">Log Contribution</h3>
-
-          <input
-            className="input input-bordered w-full mb-2"
-            placeholder="Task description"
-            value={taskDescription}
-            onChange={(e) => setTaskDescription(e.target.value)}
+          {/* Stats Cards */}
+          <StatsCards
+            totalContributions={6}
+            totalHours={25}
+            yourPercentage={52}
+            teamSize={3}
           />
 
-          <input
-            className="input input-bordered w-full mb-2"
-            type="number"
-            placeholder="Hours worked"
-            value={hours}
-            onChange={(e) => setHours(e.target.value)}
-          />
+          {/* Main Content Grid */}
+          <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+            
+            {/* Left Column: Form + Team */}
+            <div className="lg:col-span-1 space-y-6">
+              <ContributionForm
+                onSubmit={handleLogContribution}
+                loading={loading}
+              />
+              <TeamMembers members={mockTeamMembers} />
+            </div>
 
-          <button
-            className="btn btn-primary"
-            onClick={(e) => {
-              e.preventDefault()
-              void handleLogContribution()
-            }}
-          >
-            Log Contribution
-          </button>
+            {/* Right Column: History */}
+            <div className="lg:col-span-2">
+              <HistoryTable contributions={mockContributions} />
+            </div>
+
+          </div>
+
         </div>
-
-        <div className="divider">Contribution History</div>
-        <p className="text-sm">No transactions found.</p>
-
-        <div className="divider">Team Members</div>
-        <p className="text-sm">No members yet.</p>
-
-        <div className="modal-action">
-          <button className="btn" onClick={closeModal}>
-            Close
-          </button>
-        </div>
-
-      </form>
-    </dialog>
+      </div>
+    </div>
   )
 }
 
 export default ContribChain
-
