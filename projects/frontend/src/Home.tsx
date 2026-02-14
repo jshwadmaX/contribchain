@@ -1,20 +1,39 @@
 // src/Home.tsx
 import { useWallet } from '@txnlab/use-wallet-react'
 import React, { useState } from 'react'
+import { useNavigate } from 'react-router-dom'
 
-import ContribChain from "./components/ContribChain";
-import Account from "./components/Account";
-import ConnectWallet from "./components/ConnectWallet";
+import ContribChain from './components/ContribChain'
+import Account from './components/Account'
+import ConnectWallet from './components/ConnectWallet'
 
 const Home: React.FC = () => {
   const [openWalletModal, setOpenWalletModal] = useState<boolean>(false)
   const [contribChainModal, setContribChainModal] = useState<boolean>(false)
 
   const { activeAddress } = useWallet()
+  const navigate = useNavigate()
 
   const toggleWalletModal = () => {
     setOpenWalletModal(!openWalletModal)
   }
+
+  const handleLogout = () => {
+    localStorage.removeItem('isLoggedIn')
+    localStorage.removeItem('userRole')
+    localStorage.removeItem('userEmail')
+    localStorage.removeItem('teamSetupDone')
+    localStorage.removeItem('teamCode')
+    localStorage.removeItem('teamName')
+    localStorage.removeItem('teamRole')
+    localStorage.removeItem('teamMembers')
+    navigate('/login')
+  }
+
+  const userEmail = localStorage.getItem('userEmail') || ''
+  const teamName = localStorage.getItem('teamName') || ''
+  const teamRole = localStorage.getItem('teamRole') || 'member'
+  const teamCode = localStorage.getItem('teamCode') || ''
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-blue-50 via-indigo-50 to-purple-50">
@@ -32,18 +51,46 @@ const Home: React.FC = () => {
             </span>
           </div>
 
-          <button
-            className={`px-6 py-2.5 rounded-full font-semibold text-sm transition-all shadow-md
-              ${activeAddress
-                ? 'bg-green-600 text-white'
-                : 'bg-blue-600 text-white'
-              }`}
-            onClick={toggleWalletModal}
-          >
-            {activeAddress
-              ? `${activeAddress.slice(0, 6)}...${activeAddress.slice(-4)}`
-              : 'Connect Wallet'}
-          </button>
+          <div className="flex items-center gap-3">
+            {/* Wallet connect button */}
+            <button
+              className={`px-6 py-2.5 rounded-full font-semibold text-sm transition-all shadow-md
+                ${activeAddress
+                  ? 'bg-green-600 text-white'
+                  : 'bg-blue-600 text-white'
+                }`}
+              onClick={toggleWalletModal}
+            >
+              {activeAddress
+                ? `${activeAddress.slice(0, 6)}...${activeAddress.slice(-4)}`
+                : 'Connect Wallet'}
+            </button>
+
+            {/* Team badge */}
+            {teamName && (
+              <span className="hidden sm:inline-flex items-center gap-1.5 px-3 py-1.5 bg-blue-50 border border-blue-200 text-blue-700 text-xs font-medium rounded-full">
+                <span className={`w-1.5 h-1.5 rounded-full ${teamRole === 'leader' ? 'bg-yellow-400' : 'bg-blue-400'}`} />
+                {teamName}
+                {teamRole === 'leader' && <span className="text-yellow-500 font-bold">· Leader</span>}
+              </span>
+            )}
+
+            {/* User email badge */}
+            {userEmail && (
+              <span className="hidden sm:inline-block px-3 py-1.5 bg-indigo-50 border border-indigo-200 text-indigo-700 text-xs font-medium rounded-full">
+                {userEmail}
+              </span>
+            )}
+
+            {/* Logout button */}
+            <button
+              onClick={handleLogout}
+              className="px-4 py-2.5 rounded-full font-semibold text-sm transition-all shadow-md
+                bg-red-50 border border-red-200 text-red-600 hover:bg-red-600 hover:text-white"
+            >
+              Logout
+            </button>
+          </div>
         </div>
       </header>
 
