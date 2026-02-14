@@ -1,11 +1,12 @@
 import React, { useState } from 'react'
 import { useWallet } from '@txnlab/use-wallet-react'
 
-// Import new components
 import ContributionForm from './contrib/ContributionForm'
 import StatsCards from './contrib/StatsCards'
 import HistoryTable from './contrib/HistoryTable'
 import TeamMembers from './contrib/TeamMembers'
+// ✅ ADD THIS IMPORT
+import AIAssistant from './contrib/AIAssistant'
 
 interface ContribChainProps {
   openModal: boolean
@@ -15,8 +16,10 @@ interface ContribChainProps {
 const ContribChain: React.FC<ContribChainProps> = ({ openModal, closeModal }) => {
   const { activeAddress } = useWallet()
   const [loading, setLoading] = useState(false)
+  // ✅ ADD AI CHAT TAB STATE
+  const [activeTab, setActiveTab] = useState<'dashboard' | 'ai-chat'>('dashboard')
 
-  // Mock data (replace with real blockchain data later)
+  // ... (keep your existing mock data)
   const mockContributions = [
     {
       id: '1',
@@ -57,10 +60,7 @@ const ContribChain: React.FC<ContribChainProps> = ({ openModal, closeModal }) =>
 
   const handleLogContribution = async (task: string, hours: number) => {
     setLoading(true)
-    // TODO: Add blockchain logic here
     console.log('Logging:', { task, hours })
-    
-    // Simulate blockchain delay
     setTimeout(() => {
       setLoading(false)
       alert('Contribution logged! ✅')
@@ -71,13 +71,8 @@ const ContribChain: React.FC<ContribChainProps> = ({ openModal, closeModal }) =>
 
   return (
     <div className="fixed inset-0 z-50 overflow-y-auto">
-      {/* Backdrop */}
-      <div
-        className="fixed inset-0 bg-black/50 backdrop-blur-sm"
-        onClick={closeModal}
-      />
+      <div className="fixed inset-0 bg-black/50 backdrop-blur-sm" onClick={closeModal} />
 
-      {/* Modal Content */}
       <div className="relative min-h-screen flex items-center justify-center p-4">
         <div className="relative bg-gradient-to-br from-blue-50 via-white to-indigo-50 rounded-2xl shadow-2xl max-w-7xl w-full p-8">
           
@@ -91,42 +86,67 @@ const ContribChain: React.FC<ContribChainProps> = ({ openModal, closeModal }) =>
                 Track group project contributions on Algorand blockchain
               </p>
             </div>
-            <button
-              onClick={closeModal}
-              className="text-gray-500 hover:text-gray-700 transition-colors"
-            >
+            <button onClick={closeModal} className="text-gray-500 hover:text-gray-700 transition-colors">
               <svg className="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
               </svg>
             </button>
           </div>
 
-          {/* Stats Cards */}
-          <StatsCards
-            totalContributions={6}
-            totalHours={25}
-            yourPercentage={52}
-            teamSize={3}
-          />
-
-          {/* Main Content Grid */}
-          <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-            
-            {/* Left Column: Form + Team */}
-            <div className="lg:col-span-1 space-y-6">
-              <ContributionForm
-                onSubmit={handleLogContribution}
-                loading={loading}
-              />
-              <TeamMembers members={mockTeamMembers} />
-            </div>
-
-            {/* Right Column: History */}
-            <div className="lg:col-span-2">
-              <HistoryTable contributions={mockContributions} />
-            </div>
-
+          {/* ✅ TAB NAVIGATION */}
+          <div className="flex gap-2 mb-6 border-b border-gray-200">
+            <button
+              onClick={() => setActiveTab('dashboard')}
+              className={`px-6 py-3 font-semibold transition-all ${
+                activeTab === 'dashboard'
+                  ? 'text-blue-600 border-b-2 border-blue-600'
+                  : 'text-gray-500 hover:text-gray-700'
+              }`}
+            >
+              📊 Dashboard
+            </button>
+            <button
+              onClick={() => setActiveTab('ai-chat')}
+              className={`px-6 py-3 font-semibold transition-all relative ${
+                activeTab === 'ai-chat'
+                  ? 'text-purple-600 border-b-2 border-purple-600'
+                  : 'text-gray-500 hover:text-gray-700'
+              }`}
+            >
+              🤖 AI Team Coordinator
+              <span className="absolute -top-1 -right-1 w-3 h-3 bg-green-500 rounded-full animate-pulse"></span>
+            </button>
           </div>
+
+          {/* ✅ CONDITIONAL RENDERING BASED ON TAB */}
+          {activeTab === 'dashboard' ? (
+            <>
+              <StatsCards
+                totalContributions={6}
+                totalHours={25}
+                yourPercentage={52}
+                teamSize={3}
+              />
+
+              <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+                <div className="lg:col-span-1 space-y-6">
+                  <ContributionForm onSubmit={handleLogContribution} loading={loading} />
+                  <TeamMembers members={mockTeamMembers} />
+                </div>
+
+                <div className="lg:col-span-2">
+                  <HistoryTable contributions={mockContributions} />
+                </div>
+              </div>
+            </>
+          ) : (
+            <AIAssistant
+              teamData={{
+                members: mockTeamMembers,
+                contributions: mockContributions,
+              }}
+            />
+          )}
 
         </div>
       </div>
