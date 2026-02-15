@@ -92,7 +92,15 @@ ContribChain uses Algorand smart contracts to:
 - Wallet connection  
 - Transaction success states  
 
-<img width="1920" height="1080" alt="Screenshot (1011)" src="https://github.com/user-attachments/assets/e5187130-9bf6-4f88-835e-d25efe75644f" />
+<img width="1856" height="831" alt="Screenshot (1082)" src="https://github.com/user-attachments/assets/2d28092c-7649-41e6-a01a-9130b86d989b" />
+
+<img width="1846" height="825" alt="Screenshot (1078)" src="https://github.com/user-attachments/assets/fed2a9e5-b565-4ea5-bfec-deace2714504" />
+
+<img width="1856" height="822" alt="Screenshot (1079)" src="https://github.com/user-attachments/assets/b1a0e273-980b-4c42-a422-ffd080c2d027" />
+
+<img width="1854" height="817" alt="Screenshot (1080)" src="https://github.com/user-attachments/assets/143d6865-c00e-477a-bee4-5f299bd0e3ae" />
+
+<img width="1851" height="822" alt="Screenshot (1081)" src="https://github.com/user-attachments/assets/c7e9eee7-c758-4757-a9bf-8d8a9f95ad8e" />
 
 
 ---
