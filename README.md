@@ -24,7 +24,8 @@ In academic and professional group projects:
 ---
 
 ## 💡 Our Solution – ContribChain
-<img width="507" height="544" alt="Screenshot (997)" src="https://github.com/user-attachments/assets/69932e44-a5a4-4ad9-b4ba-0e2a3cf0b2fd" />
+<img width="687" height="700" alt="Screenshot (1061)" src="https://github.com/user-attachments/assets/7542fc3f-f1e7-45d7-b9b1-ec6a5f399edd" />
+
 
 
 ContribChain uses Algorand smart contracts to:
@@ -48,7 +49,8 @@ ContribChain uses Algorand smart contracts to:
 - **Network:** Testnet
 
 ### Flow
-<img width="844" height="532" alt="Screenshot (999)" src="https://github.com/user-attachments/assets/bcef5130-9bbe-4a4b-93c5-d33662560744" />
+<img width="792" height="513" alt="Screenshot (1063)" src="https://github.com/user-attachments/assets/71a6f174-6a58-4b46-8828-22856d799a80" />
+
 
 1. User connects Algorand wallet  
 2. Creates / joins project  
