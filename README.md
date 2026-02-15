@@ -40,6 +40,9 @@ ContribChain uses Algorand smart contracts to:
 
 ## 🧱 Architecture
 
+<img width="516" height="676" alt="Screenshot (1067)" src="https://github.com/user-attachments/assets/d6a3dbca-489d-44c7-b477-c5d44dd801d1" />
+
+
 ### Tech Stack
 
 - **Blockchain:** Algorand  
