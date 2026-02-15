@@ -5,7 +5,7 @@
 ContribChain is a decentralized platform that tracks **individual contributions in group projects** using immutable blockchain records.  
 It eliminates freeloading, disputes, and biased grading by providing verifiable proof of work.
 
-![ContribChain](https://github.com/user-attachments/assets/2f098add-fbfb-418a-a22c-0e4d0cfc996a)
+ ![ContribChain](https://github.com/user-attachments/assets/2f098add-fbfb-418a-a22c-0e4d0cfc996a)
 
 
 ---
